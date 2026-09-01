@@ -37,6 +37,11 @@ jobs:
         run: |
           powershell -NoProfile -ExecutionPolicy Bypass -File scripts\download_ffmpeg.ps1
 
+      - name: UI smoke test
+        shell: pwsh
+        run: |
+          python -c "import app; window=app.App(); window.update_idletasks(); window.destroy(); print('UI smoke test passed')"
+
       - name: Build
         shell: cmd
         run: build.bat
