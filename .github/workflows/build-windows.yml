@@ -1,0 +1,49 @@
+name: Build Windows
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "**.py"
+      - "requirements.txt"
+      - "ImageToAnimation.spec"
+      - "build.bat"
+      - "scripts/**"
+      - ".github/workflows/build-windows.yml"
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Download FFmpeg
+        shell: pwsh
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass -File scripts\download_ffmpeg.ps1
+
+      - name: Build
+        shell: cmd
+        run: build.bat
+
+      - name: Upload Windows build
+        uses: actions/upload-artifact@v4
+        with:
+          name: ImageToAnimation-Windows
+          path: dist/ImageToAnimation/
+          if-no-files-found: error
